@@ -8,11 +8,11 @@ Having a 13k+ photos library, I wanted to export all of my photos keeping album 
 
 ## What it does
 
-The script simply browses the Photos.app database to retrieve albums, create folders according to the albums, and copy the original photos from the photo library.
+The script simply browses a read-only copy of the Photos.app database to retrieve albums, create folders according to the albums, and copy the original photos from the photo library.
 
 ## What it doesn't do
 
-The script doersn't keep trace of any metadata you should have set on photos, nor face recognition or things like that. It simply copîes photos. If a photo appears on multiple folders, then the photo is duplicated on each folder.
+The script doesn't keep trace of any metadata you should have set on photos, nor face recognition or things like that. It simply copies photos. If a photo appears on multiple folders, then the photo is duplicated on each folder.
 
 ## How-to
 
