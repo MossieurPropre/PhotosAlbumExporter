@@ -2,8 +2,8 @@ const exec = require('child_process').exec
 const sqlite3 = require('sqlite3')
 
 /* Edit those 2 next lines according to your library and output paths */
-let photosLibraryFolder = `/Volumes/LaCie/Aurélien/Photos/Photos Library.photoslibrary`
-let outputFolder = `/Volumes/Photos/Sauvegardes photo`
+let photosLibraryFolder = `~/Pictures/Photos Library.photoslibrary`
+let outputFolder = `~/Pictures/export`
 
 async function shellExec(cmd) {
     return new Promise((resolve, reject) => {
@@ -129,7 +129,7 @@ async function main() {
 
         let photos
         try {
-            photos = await query(`SELECT RKMaster.fileName, RKMaster.imagePath FROM RKAlbumVersion INNER JOIN RKMaster ON (RKMaster.modelId = RKAlbumVersion.versionId) WHERE RKAlbumVersion.albumId = ${album.albumId}`, database)
+            photos = await query(`SELECT RKMaster.fileName, RKMaster.imagePath FROM RKAlbumVersion INNER JOIN RKVersion ON (RKVersion.modelId = RKAlbumVersion.versionId) INNER JOIN RKMaster ON (RKMaster.uuid = RKVersion.masterUuid) WHERE RKAlbumVersion.albumId = ${album.albumId}`, database)
             console.log(`  - Albums photos retrieved`)
         } catch (err) {
             console.error(`* Error retrieving photos :`)
