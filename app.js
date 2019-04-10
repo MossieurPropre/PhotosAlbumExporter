@@ -1,5 +1,6 @@
 const exec = require('child_process').exec
 const sqlite3 = require('sqlite3')
+const fs = require('fs')
 
 /* Edit those 2 next lines according to your library and output paths */
 let photosLibraryFolder = `~/Pictures/Photos Library.photoslibrary`
@@ -184,6 +185,10 @@ async function main() {
     }
 
     console.log(`- Exported ${cptr} photos with ${(errors.length > 0) ? errors.length : "no"} error${(errors.length > 1) ? "s" : ""}`)
+    if (errors.length > 0) {
+        console.log("You can check for errors in errors.log")
+        fs.writeFileSync('errors.log', JSON.stringify(errors, null, 4))
+    }
 
 }
 
