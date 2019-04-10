@@ -2,8 +2,8 @@ const exec = require('child_process').exec
 const sqlite3 = require('sqlite3')
 
 /* Edit those 2 next lines according to your library and output paths */
-let photosLibraryFolder = `~/Pictures/Photos Library.photoslibrary`
-let outputFolder = `~/Pictures/export`
+let photosLibraryFolder = `/Volumes/LaCie/Aurélien/Photos/Photos Library.photoslibrary`
+let outputFolder = `/Volumes/Photos/Sauvegardes photo`
 
 async function shellExec(cmd) {
     return new Promise((resolve, reject) => {
@@ -61,10 +61,14 @@ async function query(query, db) {
     })
 }
 
+function sanitize(str) {
+    return str.replace(/\s/g, "\\ ").replace(/\(/g, "\\(").replace(/\)/g, "\\)").replace(/'/g, "\\'").replace(/"/g, "\\\"")
+}
+
 async function main() {
     let cptr = 0
-    photosLibraryFolder = photosLibraryFolder.replace(/ /g, "\\ ") // Escaping white spaces in input folder
-    outputFolder = outputFolder.replace(/ /g, "\\ ") // Escaping white spaces in output folder
+    photosLibraryFolder = sanitize(photosLibraryFolder) // Escaping white spaces in input folder
+    outputFolder = sanitize(outputFolder) // Escaping white spaces in output folder
 
     // First thing : copy database to ./tmp to use an unlocked version of it
     try {
@@ -113,7 +117,7 @@ async function main() {
         let album = albums[i]
         console.log(`- Album : ` + album.name)
 
-        let albumFolder = `${outputFolder}/${(album.name).replace(/\//, "-").replace(/ /g, "\\ ")}` // Removing / from album names, escaping white space
+        let albumFolder = `${outputFolder}/${sanitize(album.name).replace(/\//g, "-")}` // Removing / from album names, escaping white space
         try {
             await shellExec(`mkdir -p ${albumFolder}`)
             console.log(`  - Album folder created`)
@@ -135,8 +139,10 @@ async function main() {
 
         for (let j = 0 ; j < photos.length ; j++) {
             let photo = photos[j]
+            let imagePath = sanitize(photo.imagePath)
+            let fileName = sanitize(photo.fileName)
             try {
-                await shellExec(`cp ${photosLibraryFolder}/Masters/${photo.imagePath} ${albumFolder}/${photo.fileName}`)
+                await shellExec(`cp ${photosLibraryFolder}/Masters/${imagePath} ${albumFolder}/${fileName}`)
                 console.log(`  - Copied : ${photo.fileName}`)
                 cptr++
             } catch (err) {
