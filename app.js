@@ -5,6 +5,8 @@ const sqlite3 = require('sqlite3')
 let photosLibraryFolder = `~/Pictures/Photos Library.photoslibrary`
 let outputFolder = `~/Pictures/export`
 
+let errors = []
+
 async function shellExec(cmd) {
     return new Promise((resolve, reject) => {
         exec(cmd, (error, stdout, stderr) => {
@@ -122,14 +124,19 @@ async function main() {
             await shellExec(`mkdir -p ${albumFolder}`)
             console.log(`  - Album folder created`)
         } catch (err) {
-            console.error(`  * Error creating output folder :`)
-            console.log(err)
-            process.exit(-1)
+            console.error(`  * Error creating output folder`)
+            let error = {
+                process: "Output folder creation",
+                object: albumFolder,
+                rawError: err
+            }
+            errors.push(error)
+            continue
         }
 
         let photos
         try {
-            photos = await query(`SELECT RKMaster.fileName, RKMaster.imagePath FROM RKAlbumVersion INNER JOIN RKVersion ON (RKVersion.modelId = RKAlbumVersion.versionId) INNER JOIN RKMaster ON (RKMaster.uuid = RKVersion.masterUuid) WHERE RKAlbumVersion.albumId = ${album.albumId}`, database)
+            photos = await query(`SELECT RKMaster.fileName, RKMaster.imagePath FROM RKAlbumVersion INNER JOIN RKVersion ON (RKVersion.modelId = RKAlbumVersion.versionId) INNER JOIN RKMaster ON (RKMaster.uuid = RKVersion.masterUuid) WHERE RKAlbumVersion.albumId = ${album.albumId} AND RKMaster.filename IS NOT NULL`, database)
             console.log(`  - Albums photos retrieved`)
         } catch (err) {
             console.error(`* Error retrieving photos :`)
@@ -146,9 +153,13 @@ async function main() {
                 console.log(`  - Copied : ${photo.fileName}`)
                 cptr++
             } catch (err) {
-                console.error(`  * Error copying photo ${photo.fileName} :`)
-                console.log(err)
-                process.exit(-1)
+                console.error(`  * Error copying photo ${photo.fileName}`)
+                let error = {
+                    process: "Photo copying",
+                    object: photo.fileName,
+                    rawError: err
+                }
+                errors.push(error)
             }
             
         }
@@ -172,7 +183,7 @@ async function main() {
         process.exit(-1)
     }
 
-    console.log(`- Exported ${cptr} photos without error`)
+    console.log(`- Exported ${cptr} photos with ${(errors.length > 0) ? errors.length : "no"} error${(errors.length > 1) ? "s" : ""}`)
 
 }
 
