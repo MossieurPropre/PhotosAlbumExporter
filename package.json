@@ -1,5 +1,5 @@
 {
-  "name": "PhotosAlbumExporter",
+  "name": "photosalbumexporter",
   "version": "0.0.1",
   "description": "Export Photos.app photos without losing albums structure",
   "main": "app.js",

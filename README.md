@@ -4,7 +4,7 @@ Export Apple Photos.app photos using albums structure
 
 ## Context
 
-Having a 13k+ photos library, I wanted to export all of my photos keeping album structure as folders. It turned to be impossible as Photos.app crashes after exporting ~100 photos. So I made this scrtipt.
+Having a 13k+ photos library, I wanted to export all of my photos keeping album structure as folders. It turned to be impossible as Photos.app crashes after exporting ~100 photos. So I made this script.
 
 ## What it does
 
