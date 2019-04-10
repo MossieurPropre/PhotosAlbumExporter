@@ -1,0 +1,17 @@
+{
+  "name": "PhotosAlbumExporter",
+  "version": "0.0.1",
+  "description": "Export Photos.app photos without losing albums structure",
+  "main": "app.js",
+  "author": "Aurélien Christman",
+  "license": "MIT",
+  "dependencies": {
+    "sqlite3": "^4.0.6"
+  },
+  "scripts": {
+    "start": "node app.js"
+  },
+  "devDependencies": {
+    "node-gyp": "^3.8.0"
+  }
+}
