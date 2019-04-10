@@ -2,8 +2,8 @@ const exec = require('child_process').exec
 const sqlite3 = require('sqlite3')
 
 /* Edit those 2 next lines according to your library and output paths */
-const photosLibraryFolder = `~/Pictures/Photos Library.photoslibrary`
-const outputFolder = `~/Pictures/export`
+let photosLibraryFolder = `~/Pictures/Photos Library.photoslibrary`
+let outputFolder = `~/Pictures/export`
 
 async function shellExec(cmd) {
     return new Promise((resolve, reject) => {
@@ -63,7 +63,8 @@ async function query(query, db) {
 
 async function main() {
     let cptr = 0
-    const inputFolder = photosLibraryFolder.replace(/ /g, "\\ ") // Escaping white spaces in input folder
+    photosLibraryFolder = photosLibraryFolder.replace(/ /g, "\\ ") // Escaping white spaces in input folder
+    outputFolder = outputFolder.replace(/ /g, "\\ ") // Escaping white spaces in output folder
 
     // First thing : copy database to ./tmp to use an unlocked version of it
     try {
@@ -76,7 +77,7 @@ async function main() {
     }
 
     try {
-        await shellExec(`cp ${inputFolder}/database/photos.db ./tmp/`)
+        await shellExec(`cp ${photosLibraryFolder}/database/photos.db ./tmp/`)
         console.log(`- Original database copied`)
     } catch (err) {
         console.error(`* Error copying original database :`)
@@ -135,7 +136,7 @@ async function main() {
         for (let j = 0 ; j < photos.length ; j++) {
             let photo = photos[j]
             try {
-                await shellExec(`cp ${inputFolder}/Masters/${photo.imagePath} ${albumFolder}/${photo.fileName}`)
+                await shellExec(`cp ${photosLibraryFolder}/Masters/${photo.imagePath} ${albumFolder}/${photo.fileName}`)
                 console.log(`  - Copied : ${photo.fileName}`)
                 cptr++
             } catch (err) {
