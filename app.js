@@ -65,7 +65,19 @@ async function query(query, db) {
 }
 
 function sanitize(str) {
-    return str.replace(/\s/g, "\\ ").replace(/\(/g, "\\(").replace(/\)/g, "\\)").replace(/'/g, "\\'").replace(/"/g, "\\\"")
+    return str
+            .replace(/\s/g, "\\ ")
+            .replace(/\(/g, "\\(")
+            .replace(/\)/g, "\\)")
+            .replace(/'/g, "\\'")
+            .replace(/"/g, "\\\"")
+            .replace(/&/g, "\\&")
+            .replace(/>/g, "\\>")
+            .replace(/</g, "\\<")
+            .replace(/\|/g, "\\|")
+            .replace(/:/g, "\\:")
+            .replace(/;/g, "\\;")
+            .replace(/,/g, "\\,")
 }
 
 async function main() {
@@ -150,7 +162,7 @@ async function main() {
             let imagePath = sanitize(photo.imagePath)
             let fileName = sanitize(photo.fileName)
             try {
-                await shellExec(`cp ${photosLibraryFolder}/Masters/${imagePath} ${albumFolder}/${fileName}`)
+                await shellExec(`cp -p ${photosLibraryFolder}/Masters/${imagePath} ${albumFolder}/${fileName}`)
                 console.log(`  - Copied : ${photo.fileName}`)
                 cptr++
             } catch (err) {
