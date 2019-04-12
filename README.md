@@ -8,7 +8,7 @@ Having a 13k+ photos library, I wanted to export all of my photos keeping album 
 
 ## What it does
 
-The script simply browses a read-only copy of the Photos.app database to retrieve albums, create folders according to the albums, and copy the original photos from the photo library.
+The script simply browses a read-only copy of the Photos.app database to retrieve albums, create folders according to the albums, and copy the original photos from the photo library. It can also repair the creation date using to photo date stored in the database.
 
 ## What it doesn't do
 
@@ -27,7 +27,7 @@ The script doesn't keep trace of any metadata you should have set on photos, nor
 
 `cd PhotosAlbumExporter`
 
-Edit `app.js` to match your folder configuration (Photos library folder and output folder)
+Edit `app.js` to match your folder configuration (Photos library folder and output folder) and to enable date reparation if necessary.
 
 `yarn install`
 

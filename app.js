@@ -5,7 +5,10 @@ const fs = require('fs')
 /* Edit those 2 next lines according to your library and output paths */
 let photosLibraryFolder = `~/Pictures/Photos Library.photoslibrary`
 let outputFolder = `~/Pictures/export`
+/* Set this to true to update files dates to the ones stored in the database */
+const repairDates = false
 
+const timestampOffset = 978307200
 let errors = []
 
 async function shellExec(cmd) {
@@ -80,6 +83,10 @@ function sanitize(str) {
             .replace(/,/g, "\\,")
 }
 
+function addZero(number) {
+    return (number > 9) ? number : "0" + number
+}
+
 async function main() {
     let cptr = 0
     photosLibraryFolder = sanitize(photosLibraryFolder) // Escaping white spaces in input folder
@@ -149,7 +156,7 @@ async function main() {
 
         let photos
         try {
-            photos = await query(`SELECT RKMaster.fileName, RKMaster.imagePath FROM RKAlbumVersion INNER JOIN RKVersion ON (RKVersion.modelId = RKAlbumVersion.versionId) INNER JOIN RKMaster ON (RKMaster.uuid = RKVersion.masterUuid) WHERE RKAlbumVersion.albumId = ${album.albumId} AND RKMaster.filename IS NOT NULL`, database)
+            photos = await query(`SELECT RKMaster.fileName, RKMaster.imagePath, RKMaster.imageDate FROM RKAlbumVersion INNER JOIN RKVersion ON (RKVersion.modelId = RKAlbumVersion.versionId) INNER JOIN RKMaster ON (RKMaster.uuid = RKVersion.masterUuid) WHERE RKAlbumVersion.albumId = ${album.albumId} AND RKMaster.filename IS NOT NULL`, database)
             console.log(`  - Albums photos retrieved`)
         } catch (err) {
             console.error(`* Error retrieving photos :`)
@@ -161,6 +168,7 @@ async function main() {
             let photo = photos[j]
             let imagePath = sanitize(photo.imagePath)
             let fileName = sanitize(photo.fileName)
+
             try {
                 await shellExec(`cp -p ${photosLibraryFolder}/Masters/${imagePath} ${albumFolder}/${fileName}`)
                 console.log(`  - Copied : ${photo.fileName}`)
@@ -174,7 +182,27 @@ async function main() {
                 }
                 errors.push(error)
             }
-            
+
+            if (repairDates === true) {
+                // Set creation date. The file's one can be different in case of multiple file manipulation of library over time.
+                let creationDate = photo.imageDate
+                let date = new Date()
+                date.setTime((parseInt(creationDate) + timestampOffset) * 1000)
+                let fileDate = `${addZero(date.getFullYear())}${addZero(date.getMonth() + 1)}${addZero(date.getDate())}${addZero(date.getHours())}${addZero(date.getMinutes())}.${addZero(date.getSeconds())}`
+                
+                try {
+                    await shellExec(`touch -m -a -t ${fileDate} ${albumFolder}/${fileName}`)
+                    console.log(`  - Date set : ${date} (${fileDate})`)
+                } catch(err) {
+                    console.error(`  * Error setting date ${date} (${fileDate})`)
+                    let error = {
+                        process: "Photo date",
+                        object: photo.fileName,
+                        rawError: err
+                    }
+                    errors.push(error)
+                }
+            }
         }
     }
 
